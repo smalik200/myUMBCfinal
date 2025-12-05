@@ -1,0 +1,1667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>myUMBC Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        nav {
+            background-color: #d3d3d3;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 60px;
+            flex: 1;
+        }
+
+        .nav-links a {
+            color: #555;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .nav-links a:hover {
+            color: #000;
+        }
+
+        .star-icon {
+            width: 60px;
+            height: 60px;
+            background-color: #ffd700;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .star-icon:hover {
+            transform: scale(1.1);
+        }
+
+        .star-icon::after {
+            content: "Student\AInfo";
+            white-space: pre;
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.2;
+            color: #333;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 120px;
+            right: 40px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .notification-icon {
+            width: 0;
+            height: 0;
+            border-left: 40px solid transparent;
+            border-right: 40px solid transparent;
+            border-bottom: 70px solid #ff0000;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .notification-icon::after {
+            content: "!";
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            position: absolute;
+            top: 15px;
+            left: -8px;
+        }
+
+        .notification-text {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .main-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: calc(100vh - 120px);
+            padding: 40px;
+        }
+
+        .welcome-card {
+            background-color: #d3d3d3;
+            padding: 60px 80px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 800px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .welcome-card h1 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .welcome-card h2 {
+            font-size: 24px;
+            color: #555;
+            margin-bottom: 40px;
+            font-weight: normal;
+        }
+
+        .welcome-card p {
+            font-size: 18px;
+            color: #444;
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: flex;
+        }
+
+        .student-info-card {
+            background-color: #d3d3d3;
+            padding: 60px 80px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 700px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .student-info-card h2 {
+            font-size: 36px;
+            color: #333;
+            margin-bottom: 60px;
+        }
+
+        .student-info-card p {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .edit-btn {
+            position: fixed;
+            top: 180px;
+            right: 80px;
+            width: 180px;
+            height: 180px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .edit-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .advisor-notes-card {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 8px;
+            flex: 1;
+            max-width: 400px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .advisor-notes-card h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+            text-decoration: underline;
+        }
+
+        .note-item {
+            background-color: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .note-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .note-date {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .note-preview {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .schedule-meeting-card {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 8px;
+            flex: 1;
+            max-width: 500px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .schedule-meeting-card h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+            text-decoration: underline;
+        }
+
+        .calendar {
+            border: 2px solid #666;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+            margin-top: 20px;
+        }
+
+        .calendar-cell {
+            border: 1px solid #666;
+            padding: 30px 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            color: #333;
+            background-color: #d3d3d3;
+            min-height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .calendar-cell:hover:not(.empty) {
+            background-color: #c0c0c0;
+        }
+
+        .calendar-cell.selected {
+            background-color: #ffd700;
+        }
+
+        .advisor-info-card {
+            background-color: #d3d3d3;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 300px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .advisor-info-card h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-decoration: underline;
+        }
+
+        .advisor-info-card p {
+            font-size: 16px;
+            color: #444;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .degree-planner-container {
+            width: 100%;
+            max-width: 1400px;
+            padding: 40px;
+        }
+
+        .grad-year {
+            font-size: 20px;
+            font-style: italic;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .planner-content {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 30px;
+            align-items: start;
+        }
+
+        .current-schedule-card {
+            background-color: #d3d3d3;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .current-schedule-card h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .course-item {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #333;
+            text-align: center;
+        }
+
+        .plan-status-card {
+            background-color: #ffd700;
+            padding: 40px 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .plan-status-card h3 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .status-flow {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .status-item {
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .status-item.completed {
+            background-color: #90EE90;
+        }
+
+        .status-item.current {
+            background-color: #FFD700;
+            font-weight: bold;
+        }
+
+        .status-item.pending {
+            background-color: #ddd;
+        }
+
+        .four-year-plan {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .four-year-plan h3 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .years-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .year-box {
+            background-color: #ffd700;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .year-box h4 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .year-box p {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 6px;
+            padding: 5px;
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 3px;
+        }
+
+        .side-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .side-button {
+            background-color: #d3d3d3;
+            padding: 30px 40px;
+            border-radius: 50px;
+            text-align: center;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+            border: 2px solid #999;
+        }
+
+        .side-button:hover {
+            transform: scale(1.05);
+        }
+
+        .recommendations-container {
+            width: 100%;
+            max-width: 1400px;
+            padding: 40px;
+            display: flex;
+            gap: 50px;
+            align-items: flex-start;
+        }
+
+        .recommendations-left {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            flex: 1;
+        }
+
+        .recommendations-right {
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            flex: 1;
+        }
+
+        .smart-recommendations-card {
+            background-color: #d3d3d3;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 2px solid #999;
+        }
+
+        .smart-recommendations-card h2 {
+            font-size: 28px;
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .recommendation-criteria {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .criteria-item {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 5px;
+        }
+
+        .criteria-label {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .criteria-value {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .request-button {
+            background-color: #ff3333;
+            padding: 40px 60px;
+            border-radius: 100px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .request-button:hover {
+            transform: scale(1.05);
+            background-color: #ff4444;
+        }
+
+        .why-course-card {
+            background-color: #ffd700;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 200px;
+            border: 2px solid #ccaa00;
+        }
+
+        .why-course-card h3 {
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .course-reason {
+            background-color: rgba(255,255,255,0.6);
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .course-reason h4 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .course-reason p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        .future-suggestions-card {
+            background-color: #ffd700;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            min-height: 250px;
+            border: 2px solid #ccaa00;
+        }
+
+        .future-suggestions-card h3 {
+            font-size: 26px;
+            color: #333;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .suggestion-item {
+            background-color: rgba(255,255,255,0.6);
+            padding: 12px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+
+        .suggestion-item strong {
+            color: #333;
+        }
+
+        .suggestion-item span {
+            color: #555;
+            font-size: 14px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #999;
+            border-radius: 4px;
+            font-family: Arial, sans-serif;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-primary {
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        .btn-secondary {
+            background-color: #d3d3d3;
+            color: #333;
+        }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+
+        .progress-tracker-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+        }
+
+        .progress-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .progress-header h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .progress-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .stat-box {
+            background-color: #d3d3d3;
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .stat-number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+            margin-top: 10px;
+        }
+
+        .requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .requirement-card {
+            background-color: #d3d3d3;
+            padding: 25px;
+            border-radius: 8px;
+        }
+
+        .requirement-card h3 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            background-color: #fff;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            font-weight: bold;
+            transition: width 0.3s;
+        }
+
+        .course-search-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 40px;
+        }
+
+        .search-box {
+            background-color: #d3d3d3;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #999;
+            border-radius: 8px;
+        }
+
+        .filter-section {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .filter-group {
+            flex: 1;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #999;
+            border-radius: 4px;
+        }
+
+        .course-results {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .course-card {
+            background-color: #d3d3d3;
+            padding: 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .course-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .course-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .course-code {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .course-credits {
+            background-color: #ffd700;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .course-title {
+            font-size: 16px;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .course-details {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-links">
+            <a onclick="showPage('progress')">Progress Tracker</a>
+            <a onclick="showPage('advisor')">Advisor Notes</a>
+            <a onclick="showPage('planner')">Degree Planner</a>
+            <a onclick="showPage('search')">Course Search</a>
+            <a onclick="showPage('recommendations')">Recommendations</a>
+        </div>
+        <div class="star-icon" onclick="showPage('studentInfo')"></div>
+    </nav>
+
+    <div class="notification-container" onclick="showNotifications()">
+        <div class="notification-icon"></div>
+        <div class="notification-text">Notifications</div>
+    </div>
+
+    <!-- Home Page -->
+    <div class="main-container page active" id="homePage">
+        <div class="welcome-card">
+            <h1>Hello Milo!</h1>
+            <h2>Welcome to your myUMBC</h2>
+            
+            <p>You have earned 99 credits! You need 21 more to graduate. Please plan your schedule in the degree planner</p>
+            
+            <p>Look at "Recommendations" to figure out what courses to take</p>
+        </div>
+    </div>
+
+    <!-- Student Info Page -->
+    <div class="main-container page" id="studentInfoPage">
+        <div class="student-info-card">
+            <h2>Student Info</h2>
+            
+            <p>Name: Milo Morales</p>
+            <p>Email: milo1@umbc.edu</p>
+            <p>Major: Information Systems</p>
+            <p>GPA: 3.25/4</p>
+            <p>Total Earned Credits: 99</p>
+        </div>
+        <div class="edit-btn" onclick="openEditModal()">Edit Info</div>
+    </div>
+
+    <!-- Advisor Notes Page -->
+    <div class="page" id="advisorPage" style="display: flex; padding: 40px; gap: 30px; width: 100%; justify-content: center;">
+        <div class="advisor-notes-card">
+            <h2>Advisor Notes</h2>
+            <div class="note-item" onclick="showNoteDetail('June 16, 2025', 'Discussed capstone project options. Recommended focusing on cybersecurity or data analytics track. Student showing strong interest in database management.')">
+                <div class="note-date">June 16, 2025</div>
+                <div class="note-preview">Discussed capstone project options...</div>
+            </div>
+            <div class="note-item" onclick="showNoteDetail('April 10, 2025', 'Registration planning for Fall 2025. Student needs IS 448, IS 436, and electives. Recommended IS 477 (Database Design) and IS 451 (Systems Analysis).')">
+                <div class="note-date">April 10, 2025</div>
+                <div class="note-preview">Registration planning for Fall 2025...</div>
+            </div>
+            <div class="note-item" onclick="showNoteDetail('November 2, 2024', 'Mid-semester check-in. Student performing well in IS 300 and IS 247. Discussed internship opportunities for Summer 2025. Provided contacts at local tech companies.')">
+                <div class="note-date">November 2, 2024</div>
+                <div class="note-preview">Mid-semester check-in. Student performing well...</div>
+            </div>
+        </div>
+
+        <div class="schedule-meeting-card">
+            <h2>Schedule Meeting</h2>
+            <div class="calendar" id="calendar">
+                <div class="calendar-cell empty"></div>
+                <div class="calendar-cell empty"></div>
+                <div class="calendar-cell" onclick="selectDate(this, 1)">1</div>
+                <div class="calendar-cell" onclick="selectDate(this, 2)">2</div>
+                <div class="calendar-cell" onclick="selectDate(this, 3)">3</div>
+                <div class="calendar-cell empty"></div>
+                <div class="calendar-cell" onclick="selectDate(this, 4)">4</div>
+                <div class="calendar-cell" onclick="selectDate(this, 5)">5</div>
+                <div class="calendar-cell" onclick="selectDate(this, 6)">6</div>
+                <div class="calendar-cell" onclick="selectDate(this, 7)">7</div>
+                <div class="calendar-cell" onclick="selectDate(this, 8)">8</div>
+                <div class="calendar-cell" onclick="selectDate(this, 9)">9</div>
+                <div class="calendar-cell" onclick="selectDate(this, 10)">10</div>
+                <div class="calendar-cell" onclick="selectDate(this, 11)">11</div>
+                <div class="calendar-cell" onclick="selectDate(this, 12)">12</div>
+            </div>
+            <div style="margin-top: 20px; text-align: center;">
+                <button class="btn btn-primary" onclick="confirmMeeting()">Confirm Meeting</button>
+            </div>
+        </div>
+
+        <div class="advisor-info-card">
+            <h3>Advisor Info:</h3>
+            <p><strong>Ben Thomas</strong></p>
+            <p>bthomas3@umbc.edu</p>
+            <p style="margin-top: 15px; font-size: 14px;">Office: ITE 408<br>Hours: M/W 2-4pm</p>
+        </div>
+    </div>
+
+    <!-- Degree Planner Page -->
+    <div class="page" id="plannerPage">
+        <div class="degree-planner-container">
+            <div class="grad-year">Expected Grad Year: 2026</div>
+            
+            <div class="planner-content">
+                <!-- Left Column -->
+                <div style="display: flex; flex-direction: column; gap: 30px;">
+                    <div class="current-schedule-card">
+                        <h3>Current Schedule<br>Spring 2025</h3>
+                        <div class="course-item">IS 436 - Project Management</div>
+                        <div class="course-item">IS 448 - Business Intelligence</div>
+                        <div class="course-item">IS 303 - Web Development</div>
+                        <div class="course-item">PSYCH 100 - Gen Psychology</div>
+                        <div class="course-item">GES 120 - Global Studies</div>
+                    </div>
+                    
+                    <div class="plan-status-card">
+                        <h3>Plan Status</h3>
+                        <div class="status-flow">
+                            <div class="status-item completed">✓ Draft</div>
+                            <div class="status-item completed">✓ Submitted</div>
+                            <div class="status-item current">→ Approved</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center Column -->
+                <div class="four-year-plan">
+                    <h3>4 Year Plan: Version 2</h3>
+                    <div class="years-grid">
+                        <div class="year-box">
+                            <h4>Year 1 (2022-2023)</h4>
+                            <p>IS 147 - Intro to Programming</p>
+                            <p>IS 201 - Management Concepts</p>
+                            <p>MATH 155 - Applied Calculus</p>
+                            <p>ENG 100 - English Composition</p>
+                            <p>STAT 121 - Statistics</p>
+                        </div>
+                        <div class="year-box">
+                            <h4>Year 2 (2023-2024)</h4>
+                            <p>IS 247 - Data & Info Management</p>
+                            <p>IS 300 - Networking Fundamentals</p>
+                            <p>IS 247 - Object-Oriented Programming</p>
+                            <p>ECON 101 - Principles of Economics</p>
+                            <p>CMSC 203 - Discrete Structures</p>
+                        </div>
+                        <div class="year-box">
+                            <h4>Year 3 (2024-2025)</h4>
+                            <p>IS 303 - Web Development</p>
+                            <p>IS 436 - Project Management</p>
+                            <p>IS 448 - Business Intelligence</p>
+                            <p>PSYCH 100 - Gen Psychology</p>
+                            <p>GES 120 - Global Studies</p>
+                        </div>
+                        <div class="year-box">
+                            <h4>Year 4 (2025-2026)</h4>
+                            <p>IS 477 - Database Design</p>
+                            <p>IS 451 - Systems Analysis</p>
+                            <p>IS 495 - Capstone Project</p>
+                            <p>IS Elective (Cybersecurity)</p>
+                            <p>IS Elective (Data Analytics)</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="side-buttons">
+                    <div class="side-button" onclick="openEditPlanModal()">Edit Plan</div>
+                    <div class="side-button" onclick="viewAllPlans()">View Plans</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Page -->
+    <div class="page" id="recommendationsPage">
+        <div class="recommendations-container">
+            <div class="recommendations-left">
+                <div class="smart-recommendations-card">
+                    <h2>Smart Recommendations</h2>
+                    <div class="recommendation-criteria">
+                        <div class="criteria-item">
+                            <div class="criteria-label">Major/Minor:</div>
+                            <div class="criteria-value">Information Systems Major</div>
+                        </div>
+                        <div class="criteria-item">
+                            <div class="criteria-label">Interests:</div>
+                            <div class="criteria-value">Database Management, Cybersecurity, Data Analytics</div>
+                        </div>
+                        <div class="criteria-item">
+                            <div class="criteria-label">Past Performance:</div>
+                            <div class="criteria-value">Strong in IS 247 (A-), IS 300 (B+), Programming courses</div>
+                        </div>
+                        <div class="criteria-item">
+                            <div class="criteria-label">Prerequisite Readiness:</div>
+                            <div class="criteria-value">Qualified for 400-level IS courses, Database track ready</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="request-button" onclick="requestSuggestions()">
+                    Request Suggestions
+                </div>
+            </div>
+
+            <div class="recommendations-right">
+                <div class="why-course-card">
+                    <h3>Why This Course?</h3>
+                    <div class="course-reason">
+                        <h4>IS 477 - Database Design</h4>
+                        <p>Based on your strong performance in IS 247 and interest in database management. This course is essential for data-focused career paths.</p>
+                    </div>
+                    <div class="course-reason">
+                        <h4>IS 451 - Systems Analysis</h4>
+                        <p>Complements your project management skills from IS 436. Critical for business analyst roles.</p>
+                    </div>
+                </div>
+                
+                <div class="future-suggestions-card">
+                    <h3>Future Suggestions</h3>
+                    <div class="suggestion-item">
+                        <strong>Fall 2025:</strong><br>
+                        <span>IS 495 (Capstone), IS 460 (Cybersecurity), IS Elective</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <strong>Spring 2026:</strong><br>
+                        <span>IS 488 (Data Mining), IS 489 (Cloud Computing)</span>
+                    </div>
+                    <div class="suggestion-item">
+                        <strong>Career Prep:</strong><br>
+                        <span>Consider certifications: AWS, CompTIA Security+, SQL</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Progress Tracker Page -->
+    <div class="page" id="progressPage">
+        <div class="progress-tracker-container">
+            <div class="progress-header">
+                <h2>Academic Progress Tracker</h2>
+                <p style="color: #666;">Information Systems Major - Class of 2026</p>
+            </div>
+
+            <div class="progress-stats">
+                <div class="stat-box">
+                    <div class="stat-number">99</div>
+                    <div class="stat-label">Credits Earned</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">21</div>
+                    <div class="stat-label">Credits Remaining</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">3.25</div>
+                    <div class="stat-label">Overall GPA</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-number">82.5%</div>
+                    <div class="stat-label">Complete</div>
+                </div>
+            </div>
+
+            <div class="requirements-grid">
+                <div class="requirement-card">
+                    <h3>IS Core Requirements</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%;">34/40 credits</div>
+                    </div>
+                    <p style="font-size: 14px; color: #555;">Remaining: IS 477, IS 451, IS 495</p>
+                </div>
+
+                <div class="requirement-card">
+                    <h3>General Education</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 100%;">45/45 credits</div>
+                    </div>
+                    <p style="font-size: 14px; color: #555;">✓ Completed</p>
+                </div>
+
+                <div class="requirement-card">
+                    <h3>IS Electives</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 50%;">6/12 credits</div>
+                    </div>
+                    <p style="font-size: 14px; color: #555;">Need 2 more electives (6 credits)</p>
+                </div>
+
+                <div class="requirement-card">
+                    <h3>Free Electives</h3>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;">14/23 credits</div>
+                    </div>
+                    <p style="font-size: 14px; color: #555;">Remaining: 9 credits</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Course Search Page -->
+    <div class="page" id="searchPage">
+        <div class="course-search-container">
+            <h2 style="text-align: center; margin-bottom: 30px; font-size: 32px; color: #333;">Course Search</h2>
+            
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search for courses (e.g., IS 477, Database, Cybersecurity)" onkeyup="searchCourses()">
+                
+                <div class="filter-section">
+                    <div class="filter-group">
+                        <label>Department</label>
+                        <select id="deptFilter" onchange="searchCourses()">
+                            <option value="">All Departments</option>
+                            <option value="IS">Information Systems</option>
+                            <option value="CMSC">Computer Science</option>
+                            <option value="MATH">Mathematics</option>
+                            <option value="GES">General Education</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Level</label>
+                        <select id="levelFilter" onchange="searchCourses()">
+                            <option value="">All Levels</option>
+                            <option value="100">100-level</option>
+                            <option value="200">200-level</option>
+                            <option value="300">300-level</option>
+                            <option value="400">400-level</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Credits</label>
+                        <select id="creditsFilter" onchange="searchCourses()">
+                            <option value="">Any Credits</option>
+                            <option value="3">3 Credits</option>
+                            <option value="4">4 Credits</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="course-results" id="courseResults"></div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="editModal">
+        <div class="modal-content">
+            <div class="modal-header">Edit Student Information</div>
+            <div class="modal-body">
+                <p style="margin-bottom: 10px;"><strong>Name:</strong></p>
+                <input type="text" id="editName" value="Milo Morales">
+                
+                <p style="margin-top: 15px; margin-bottom: 10px;"><strong>Email:</strong></p>
+                <input type="email" id="editEmail" value="milo1@umbc.edu">
+                
+                <p style="margin-top: 15px; margin-bottom: 10px;"><strong>Major:</strong></p>
+                <input type="text" id="editMajor" value="Information Systems">
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('editModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveStudentInfo()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="noteModal">
+        <div class="modal-content">
+            <div class="modal-header" id="noteModalTitle"></div>
+            <div class="modal-body" id="noteModalBody"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="closeModal('noteModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="courseModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header" id="courseModalTitle"></div>
+            <div class="modal-body" id="courseModalBody"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('courseModal')">Close</button>
+                <button class="btn btn-primary" onclick="addToSchedule()">Add to Schedule</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="requestModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">Request Course Suggestions</div>
+            <div class="modal-body">
+                <p style="margin-bottom: 15px; color: #666;">Tell us what you're looking for and we'll provide personalized course recommendations.</p>
+                
+                <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 16px;">What courses are you interested in and why?</label>
+                <textarea id="requestText" rows="8" placeholder="Examples:
+• I'm interested in cybersecurity and want to prepare for security analyst roles
+• I need courses for Fall 2025 that focus on data analytics
+• What electives should I take to become a database administrator?
+• I'm worried about course difficulty - which 400-level courses are manageable?
+
+Be as specific as possible about your interests, career goals, and any concerns!" style="font-size: 14px;"></textarea>
+            </div>
+            <div class="modal-buttons">
+                <button class="btn btn-secondary" onclick="closeModal('requestModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="submitRequest()">Get Recommendations</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="responseModal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">📚 Your Personalized Course Recommendations</div>
+            <div class="modal-body" id="responseModalBody"></div>
+            <div class="modal-buttons">
+                <button class="btn btn-primary" onclick="closeModal('responseModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Course Database
+        const courses = [
+            {code: 'IS 477', title: 'Database Design and Implementation', credits: 3, dept: 'IS', level: '400', 
+             description: 'Advanced database concepts including design, normalization, SQL, and database administration.',
+             prerequisites: 'IS 247', instructor: 'Dr. Smith'},
+            {code: 'IS 451', title: 'Systems Analysis and Design', credits: 3, dept: 'IS', level: '400',
+             description: 'Methodologies for analyzing and designing information systems. Focus on requirements gathering and system modeling.',
+             prerequisites: 'IS 300', instructor: 'Dr. Johnson'},
+            {code: 'IS 495', title: 'IS Capstone Project', credits: 3, dept: 'IS', level: '400',
+             description: 'Culminating project applying IS concepts to real-world problems. Team-based project with industry partner.',
+             prerequisites: 'Senior standing', instructor: 'Dr. Williams'},
+            {code: 'IS 460', title: 'Cybersecurity Fundamentals', credits: 3, dept: 'IS', level: '400',
+             description: 'Introduction to cybersecurity principles, threats, and defensive strategies.',
+             prerequisites: 'IS 300', instructor: 'Dr. Brown'},
+            {code: 'IS 488', title: 'Data Mining and Analytics', credits: 3, dept: 'IS', level: '400',
+             description: 'Techniques for extracting knowledge from large datasets using statistical and machine learning methods.',
+             prerequisites: 'STAT 121, IS 247', instructor: 'Dr. Davis'},
+            {code: 'IS 436', title: 'Project Management', credits: 3, dept: 'IS', level: '400',
+             description: 'IT project planning, execution, and control. Agile and traditional methodologies.',
+             prerequisites: 'IS 201', instructor: 'Dr. Wilson'},
+            {code: 'IS 448', title: 'Business Intelligence', credits: 3, dept: 'IS', level: '400',
+             description: 'Business analytics, data warehousing, and visualization tools for decision making.',
+             prerequisites: 'IS 247', instructor: 'Dr. Martinez'},
+            {code: 'IS 303', title: 'Web Application Development', credits: 3, dept: 'IS', level: '300',
+             description: 'Full-stack web development using modern frameworks and technologies.',
+             prerequisites: 'IS 147', instructor: 'Dr. Anderson'},
+        ];
+
+        let selectedDate = null;
+
+        function showPage(pageId) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            
+            if (pageId === 'studentInfo') {
+                document.getElementById('studentInfoPage').classList.add('active');
+                document.getElementById('studentInfoPage').style.display = 'flex';
+            } else if (pageId === 'advisor') {
+                document.getElementById('advisorPage').style.display = 'flex';
+                document.getElementById('advisorPage').classList.add('active');
+            } else if (pageId === 'planner') {
+                document.getElementById('plannerPage').style.display = 'block';
+                document.getElementById('plannerPage').classList.add('active');
+            } else if (pageId === 'recommendations') {
+                document.getElementById('recommendationsPage').style.display = 'block';
+                document.getElementById('recommendationsPage').classList.add('active');
+            } else if (pageId === 'progress') {
+                document.getElementById('progressPage').style.display = 'block';
+                document.getElementById('progressPage').classList.add('active');
+            } else if (pageId === 'search') {
+                document.getElementById('searchPage').style.display = 'block';
+                document.getElementById('searchPage').classList.add('active');
+                searchCourses();
+            } else {
+                document.getElementById('homePage').classList.add('active');
+                document.getElementById('homePage').style.display = 'flex';
+            }
+        }
+
+        function openEditModal() {
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function saveStudentInfo() {
+            alert('Student information updated successfully!');
+            closeModal('editModal');
+        }
+
+        function showNoteDetail(date, content) {
+            document.getElementById('noteModalTitle').textContent = 'Advisor Note - ' + date;
+            document.getElementById('noteModalBody').textContent = content;
+            document.getElementById('noteModal').classList.add('active');
+        }
+
+        function selectDate(cell, date) {
+            document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected'));
+            cell.classList.add('selected');
+            selectedDate = date;
+        }
+
+        function confirmMeeting() {
+            if (selectedDate) {
+                alert(`Meeting scheduled with Ben Thomas for December ${selectedDate}, 2025. A confirmation email has been sent to milo1@umbc.edu`);
+                selectedDate = null;
+                document.querySelectorAll('.calendar-cell').forEach(c => c.classList.remove('selected'));
+            } else {
+                alert('Please select a date first.');
+            }
+        }
+
+        function openEditPlanModal() {
+            alert('Edit Plan: This would open a detailed plan editor where you can add/remove courses from your 4-year plan.');
+        }
+
+        function viewAllPlans() {
+            alert('View Plans: Showing all saved plan versions:\n\n• Version 1 (Draft)\n• Version 2 (Current - Approved)\n• Version 3 (Alternative Track)');
+        }
+
+        function requestSuggestions() {
+            document.getElementById('requestModal').classList.add('active');
+        }
+
+        function submitRequest() {
+            const requestText = document.getElementById('requestText').value.trim();
+            
+            if (!requestText) {
+                alert('Please describe what courses you\'re interested in.');
+                return;
+            }
+
+            // Analyze the request text
+            const textLower = requestText.toLowerCase();
+            
+            // Detect interests and keywords
+            const interests = [];
+            if (textLower.includes('database') || textLower.includes('sql')) interests.push('Database Management');
+            if (textLower.includes('cyber') || textLower.includes('security')) interests.push('Cybersecurity');
+            if (textLower.includes('data') || textLower.includes('analytic')) interests.push('Data Analytics');
+            if (textLower.includes('web') || textLower.includes('frontend') || textLower.includes('backend')) interests.push('Web Development');
+            if (textLower.includes('cloud') || textLower.includes('aws') || textLower.includes('azure')) interests.push('Cloud Computing');
+            if (textLower.includes('ai') || textLower.includes('machine learning') || textLower.includes('ml')) interests.push('AI/Machine Learning');
+            
+            // Detect semester preference
+            let semester = 'Both';
+            if (textLower.includes('fall 2025') || textLower.includes('fall semester')) semester = 'Fall 2025';
+            else if (textLower.includes('spring 2026') || textLower.includes('spring semester')) semester = 'Spring 2026';
+            
+            // Generate personalized recommendations
+            const recommendations = generateRecommendations(requestText, interests, semester, requestText);
+            
+            // Close request modal and show response
+            closeModal('requestModal');
+            
+            // Display recommendations
+            document.getElementById('responseModalBody').innerHTML = recommendations;
+            document.getElementById('responseModal').classList.add('active');
+            
+            // Clear form
+            document.getElementById('requestText').value = '';
+        }
+
+        function generateRecommendations(originalRequest, interests, semester, concerns) {
+            let html = '<div style="margin-bottom: 20px;">';
+            html += `<p style="background-color: #ffd700; padding: 15px; border-radius: 5px; margin-bottom: 20px;"><strong>Your Request:</strong><br>"${originalRequest.substring(0, 200)}${originalRequest.length > 200 ? '...' : ''}"</p>`;
+
+            // Recommended courses based on interests
+            html += '<h3 style="color: #333; margin-bottom: 15px;">📚 Recommended Courses:</h3>';
+            
+            const courseRecommendations = [];
+            
+            if (interests.includes('Database Management')) {
+                courseRecommendations.push({
+                    code: 'IS 477',
+                    title: 'Database Design and Implementation',
+                    reason: 'Essential for database-focused careers. You\'ve shown strong performance in IS 247, making this a natural next step.',
+                    priority: 'High'
+                });
+            }
+            
+            if (interests.includes('Cybersecurity')) {
+                courseRecommendations.push({
+                    code: 'IS 460',
+                    title: 'Cybersecurity Fundamentals',
+                    reason: 'Perfect foundation for security roles. Pairs well with your networking knowledge from IS 300.',
+                    priority: 'High'
+                });
+                courseRecommendations.push({
+                    code: 'IS 461',
+                    title: 'Advanced Network Security',
+                    reason: 'Builds on IS 460, covers penetration testing and threat analysis.',
+                    priority: 'Medium'
+                });
+            }
+            
+            if (interests.includes('Data Analytics')) {
+                courseRecommendations.push({
+                    code: 'IS 488',
+                    title: 'Data Mining and Analytics',
+                    reason: 'Critical for data analyst roles. Combines your stats background with advanced analytical techniques.',
+                    priority: 'High'
+                });
+                courseRecommendations.push({
+                    code: 'IS 448',
+                    title: 'Business Intelligence',
+                    reason: 'Learn Tableau, Power BI, and data visualization - highly valued by employers.',
+                    priority: 'Medium'
+                });
+            }
+            
+            if (interests.includes('Web Development')) {
+                courseRecommendations.push({
+                    code: 'IS 303',
+                    title: 'Web Application Development',
+                    reason: 'Modern full-stack development with React and Node.js.',
+                    priority: 'Medium'
+                });
+            }
+            
+            if (interests.includes('Cloud Computing')) {
+                courseRecommendations.push({
+                    code: 'IS 489',
+                    title: 'Cloud Computing and Architecture',
+                    reason: 'AWS and Azure skills are in high demand. Great preparation for cloud certifications.',
+                    priority: 'High'
+                });
+            }
+            
+            if (interests.includes('AI/Machine Learning')) {
+                courseRecommendations.push({
+                    code: 'CMSC 478',
+                    title: 'Introduction to Machine Learning',
+                    reason: 'Excellent cross-listed course covering ML fundamentals and Python libraries.',
+                    priority: 'High'
+                });
+            }
+            
+            // If no specific interests detected, provide general recommendations
+            if (interests.length === 0) {
+                courseRecommendations.push({
+                    code: 'IS 477',
+                    title: 'Database Design and Implementation',
+                    reason: 'Versatile skill for any IS career. Builds on your IS 247 foundation.',
+                    priority: 'High'
+                });
+                courseRecommendations.push({
+                    code: 'IS 451',
+                    title: 'Systems Analysis and Design',
+                    reason: 'Core IS skill applicable to all career paths. Complements your project management knowledge.',
+                    priority: 'High'
+                });
+                courseRecommendations.push({
+                    code: 'IS 488',
+                    title: 'Data Mining and Analytics',
+                    reason: 'Data skills are valuable across all IS specializations.',
+                    priority: 'Medium'
+                });
+            }
+            
+            // Always recommend capstone
+            courseRecommendations.push({
+                code: 'IS 495',
+                title: 'IS Capstone Project',
+                reason: 'Required for graduation. Work on real-world projects with industry partners.',
+                priority: 'Required'
+            });
+
+            // Sort by priority
+            const priorityOrder = {'Required': 0, 'High': 1, 'Medium': 2};
+            courseRecommendations.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
+
+            courseRecommendations.forEach(course => {
+                const priorityColor = course.priority === 'Required' ? '#ff3333' : 
+                                    course.priority === 'High' ? '#ffd700' : '#90EE90';
+                html += `
+                    <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin-bottom: 15px; border-left: 4px solid ${priorityColor};">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                            <strong style="font-size: 18px; color: #333;">${course.code} - ${course.title}</strong>
+                            <span style="background-color: ${priorityColor}; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">${course.priority} Priority</span>
+                        </div>
+                        <p style="color: #555; margin-top: 8px;">${course.reason}</p>
+                    </div>
+                `;
+            });
+
+            // Add timeline suggestion
+            html += '<h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">📅 Suggested Timeline:</h3>';
+            html += '<div style="background-color: #e8f4f8; padding: 15px; border-radius: 5px;">';
+            
+            if (semester === 'Fall 2025') {
+                html += '<p><strong>Fall 2025:</strong> ' + courseRecommendations.slice(0, 3).map(c => c.code).join(', ') + '</p>';
+                html += '<p style="margin-top: 8px;"><strong>Spring 2026:</strong> Consider remaining courses and electives</p>';
+            } else if (semester === 'Spring 2026') {
+                html += '<p><strong>Spring 2026:</strong> ' + courseRecommendations.slice(0, 3).map(c => c.code).join(', ') + '</p>';
+            } else {
+                html += '<p><strong>Fall 2025:</strong> ' + courseRecommendations.slice(0, 2).map(c => c.code).join(', ') + '</p>';
+                html += '<p style="margin-top: 8px;"><strong>Spring 2026:</strong> ' + courseRecommendations.slice(2, 4).map(c => c.code).join(', ') + '</p>';
+            }
+            html += '</div>';
+
+            // Address concerns based on keywords
+            const concernsLower = concerns.toLowerCase();
+            if (concernsLower.includes('difficult') || concernsLower.includes('hard') || concernsLower.includes('easy') || 
+                concernsLower.includes('workload') || concernsLower.includes('time') || concernsLower.includes('manageable')) {
+                html += '<h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">💡 About Course Difficulty:</h3>';
+                html += '<div style="background-color: #fff4e6; padding: 15px; border-radius: 5px;">';
+                html += '<p style="color: #555;">Based on your 3.25 GPA and strong performance in IS courses, you\'re well-prepared for 400-level courses. Most require 8-10 hours per week outside of class. Start with one challenging course per semester alongside easier electives for balance.</p>';
+                html += '</div>';
+            }
+
+            // Career prep advice
+            html += '<h3 style="color: #333; margin-top: 25px; margin-bottom: 15px;">🎯 Additional Recommendations:</h3>';
+            html += '<div style="background-color: #f0f8ff; padding: 15px; border-radius: 5px;">';
+            html += '<ul style="margin-left: 20px; color: #555;">';
+            
+            if (interests.includes('Cybersecurity')) {
+                html += '<li style="margin-bottom: 8px;">Consider CompTIA Security+ or CEH certification</li>';
+                html += '<li style="margin-bottom: 8px;">Join the UMBC Cyber Defense club</li>';
+            }
+            if (interests.includes('Database Management') || interests.includes('Data Analytics')) {
+                html += '<li style="margin-bottom: 8px;">Practice SQL on platforms like LeetCode or HackerRank</li>';
+                html += '<li style="margin-bottom: 8px;">Build a portfolio project using real datasets</li>';
+            }
+            if (interests.includes('Cloud Computing')) {
+                html += '<li style="margin-bottom: 8px;">AWS offers free student credits - start learning now</li>';
+                html += '<li style="margin-bottom: 8px;">AWS Cloud Practitioner certification is achievable this semester</li>';
+            }
+            
+            html += '<li style="margin-bottom: 8px;">Apply for summer internships by February</li>';
+            html += '<li style="margin-bottom: 8px;">Attend career fairs and networking events</li>';
+            html += '<li>Schedule a follow-up meeting to finalize your plan</li>';
+            html += '</ul></div>';
+
+            html += '<p style="margin-top: 20px; padding: 15px; background-color: #d4edda; border-radius: 5px; color: #155724;"><strong>📞 Next Steps:</strong> Review these recommendations and schedule a meeting with your advisor Ben Thomas (bthomas3@umbc.edu) to finalize your course selections.</p>';
+            
+            html += '</div>';
+            return html;
+        }
+
+        function searchCourses() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const deptFilter = document.getElementById('deptFilter').value;
+            const levelFilter = document.getElementById('levelFilter').value;
+            const creditsFilter = document.getElementById('creditsFilter').value;
+
+            let filtered = courses.filter(course => {
+                const matchesSearch = course.code.toLowerCase().includes(searchTerm) || 
+                                     course.title.toLowerCase().includes(searchTerm) ||
+                                     course.description.toLowerCase().includes(searchTerm);
+                const matchesDept = !deptFilter || course.dept === deptFilter;
+                const matchesLevel = !levelFilter || course.level.startsWith(levelFilter[0]);
+                const matchesCredits = !creditsFilter || course.credits === parseInt(creditsFilter);
+
+                return matchesSearch && matchesDept && matchesLevel && matchesCredits;
+            });
+
+            displayCourses(filtered);
+        }
+
+        function displayCourses(coursesToDisplay) {
+            const resultsDiv = document.getElementById('courseResults');
+            
+            if (coursesToDisplay.length === 0) {
+                resultsDiv.innerHTML = '<p style="text-align: center; color: #666; padding: 40px;">No courses found. Try adjusting your search criteria.</p>';
+                return;
+            }
+
+            resultsDiv.innerHTML = coursesToDisplay.map(course => `
+                <div class="course-card" onclick='showCourseDetail(${JSON.stringify(course)})'>
+                    <div class="course-header">
+                        <span class="course-code">${course.code}</span>
+                        <span class="course-credits">${course.credits} credits</span>
+                    </div>
+                    <div class="course-title">${course.title}</div>
+                    <div class="course-details">
+                        Instructor: ${course.instructor} | Prerequisites: ${course.prerequisites}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function showCourseDetail(course) {
+            document.getElementById('courseModalTitle').textContent = `${course.code} - ${course.title}`;
+            document.getElementById('courseModalBody').innerHTML = `
+                <p><strong>Credits:</strong> ${course.credits}</p>
+                <p><strong>Instructor:</strong> ${course.instructor}</p>
+                <p><strong>Prerequisites:</strong> ${course.prerequisites}</p>
+                <p style="margin-top: 15px;"><strong>Description:</strong></p>
+                <p>${course.description}</p>
+            `;
+            document.getElementById('courseModal').classList.add('active');
+        }
+
+        function addToSchedule() {
+            alert('Course added to your schedule planner! View it in the Degree Planner section.');
+            closeModal('courseModal');
+        }
+
+        function showNotifications() {
+            alert('📢 Notifications:\n\n• Registration for Fall 2025 opens April 15\n• Advisor meeting scheduled for Dec 5\n• IS 495 Capstone registration requires advisor approval\n• New internship opportunities posted');
+        }
+
+        // Initialize course search on page load
+        window.addEventListener('load', () => {
+            if (document.getElementById('courseResults')) {
+                searchCourses();
+            }
+        });
+    </script>
+</body>
+</html>
