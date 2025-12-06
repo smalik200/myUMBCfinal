@@ -9,7 +9,9 @@ DROP TABLE IF EXISTS DegreePlan CASCADE;
 DROP TABLE IF EXISTS Advisor CASCADE;
 DROP TABLE IF EXISTS Student CASCADE;
 
+------------------------------------------------------
 -- 1. STUDENT TABLE
+------------------------------------------------------
 CREATE TABLE Student (
     student_id     INT PRIMARY KEY,
     name           VARCHAR(100),
@@ -20,7 +22,9 @@ CREATE TABLE Student (
     total_credits  INT
 );
 
+------------------------------------------------------
 -- 2. ADVISOR TABLE
+------------------------------------------------------
 CREATE TABLE Advisor (
     advisor_id  INT PRIMARY KEY,
     name        VARCHAR(100),
@@ -28,7 +32,9 @@ CREATE TABLE Advisor (
     department  VARCHAR(100)
 );
 
--- 3. DEGREEPLAN TABLE
+------------------------------------------------------
+-- 3. DEGREE PLAN TABLE
+------------------------------------------------------
 CREATE TABLE DegreePlan (
     plan_id            INT PRIMARY KEY,
     student_id         INT REFERENCES Student(student_id),
@@ -39,7 +45,9 @@ CREATE TABLE DegreePlan (
     last_updated       TIMESTAMP
 );
 
--- 4. SEMESTERPLAN TABLE
+------------------------------------------------------
+-- 4. SEMESTER PLAN TABLE
+------------------------------------------------------
 CREATE TABLE SemesterPlan (
     semester_id   INT PRIMARY KEY,
     plan_id       INT REFERENCES DegreePlan(plan_id),
@@ -47,7 +55,9 @@ CREATE TABLE SemesterPlan (
     total_credits INT
 );
 
+------------------------------------------------------
 -- 5. COURSE TABLE
+------------------------------------------------------
 CREATE TABLE Course (
     course_id     INT PRIMARY KEY,
     course_code   VARCHAR(10),
@@ -57,7 +67,9 @@ CREATE TABLE Course (
     department    VARCHAR(50)
 );
 
+------------------------------------------------------
 -- 6. ENROLLMENT TABLE
+------------------------------------------------------
 CREATE TABLE Enrollment (
     enrollment_id INT PRIMARY KEY,
     semester_id   INT REFERENCES SemesterPlan(semester_id),
@@ -65,7 +77,9 @@ CREATE TABLE Enrollment (
     grade         VARCHAR(2)
 );
 
+------------------------------------------------------
 -- 7. REVIEW TABLE
+------------------------------------------------------
 CREATE TABLE Review (
     review_id       INT PRIMARY KEY,
     student_id      INT REFERENCES Student(student_id),
@@ -77,7 +91,9 @@ CREATE TABLE Review (
     approved        BOOLEAN
 );
 
+------------------------------------------------------
 -- 8. RECOMMENDATION TABLE
+------------------------------------------------------
 CREATE TABLE Recommendation (
     recommendation_id INT PRIMARY KEY,
     student_id        INT REFERENCES Student(student_id),
@@ -87,7 +103,9 @@ CREATE TABLE Recommendation (
     status            VARCHAR(20)
 );
 
+------------------------------------------------------
 -- 9. NOTIFICATION TABLE
+------------------------------------------------------
 CREATE TABLE Notification (
     notification_id INT PRIMARY KEY,
     student_id      INT REFERENCES Student(student_id),
@@ -97,7 +115,9 @@ CREATE TABLE Notification (
     read_status     BOOLEAN
 );
 
--- Sample data Insert
+------------------------------------------------------
+-- SAMPLE DATA INSERTS
+------------------------------------------------------
 
 -- STUDENT
 INSERT INTO Student VALUES
@@ -107,17 +127,17 @@ INSERT INTO Student VALUES
 
 -- ADVISOR
 INSERT INTO Advisor VALUES
-(2001, 'Dr. Karen Holt',   'kholt@umbc.edu', 'Computer Science & Electrical Engineering'),
-(2002, 'Prof. Michael Tran','mtran@umbc.edu','Information Systems'),
-(2003, 'Dr. Ana Rivera',   'arivera@umbc.edu','Mechanical Engineering');
+(2001, 'Dr. Karen Holt',    'kholt@umbc.edu',  'Computer Science & Electrical Engineering'),
+(2002, 'Prof. Michael Tran','mtran@umbc.edu',  'Information Systems'),
+(2003, 'Dr. Ana Rivera',    'arivera@umbc.edu','Mechanical Engineering');
 
--- DEGREEPLAN
+-- DEGREE PLAN
 INSERT INTO DegreePlan VALUES
-(3001, 1001, 2001, 'Computer Science',         2026, 'Approved',  NOW()),
-(3002, 1002, 2002, 'Information Systems',      2025, 'Submitted', NOW()),
-(3003, 1003, 2003, 'Mechanical Engineering',   2027, 'Draft',     NOW());
+(3001, 1001, 2001, 'Computer Science',        2026, 'Approved',  NOW()),
+(3002, 1002, 2002, 'Information Systems',     2025, 'Submitted', NOW()),
+(3003, 1003, 2003, 'Mechanical Engineering',  2027, 'Draft',     NOW());
 
--- SEMESTERPLAN
+-- SEMESTER PLAN
 INSERT INTO SemesterPlan VALUES
 (4001, 3001, 'Fall 2025',   15),
 (4002, 3002, 'Spring 2025', 12),
@@ -125,9 +145,9 @@ INSERT INTO SemesterPlan VALUES
 
 -- COURSE
 INSERT INTO Course VALUES
-(5001, 'CMSC202', 'Computer Science II', 4, 'CMSC201', 'Computer Science'),
-(5002, 'IS310',   'Database Design',     3, 'IS210',   'Information Systems'),
-(5003, 'ENME301', 'Dynamics',            3, 'ENME101', 'Mechanical Engineering');
+(5001, 'CMSC202', 'Computer Science II',     4, 'CMSC201', 'Computer Science'),
+(5002, 'IS310',   'Database Design',         3, 'IS210',   'Information Systems'),
+(5003, 'ENME301', 'Dynamics',                3, 'ENME101', 'Mechanical Engineering');
 
 -- ENROLLMENT
 INSERT INTO Enrollment VALUES
@@ -155,8 +175,8 @@ INSERT INTO Recommendation VALUES
 
 -- NOTIFICATION
 INSERT INTO Notification VALUES
-(9001, 1001, 'Your degree plan was approved.',          'Approval',    NOW(), TRUE),
-(9002, 1002, 'Missing prerequisite for IS310.',         'Prerequisite',NOW(), FALSE),
-(9003, 1003, 'Course ENME301 added to plan.',           'Update',      NOW(), TRUE);
+(9001, 1001, 'Your degree plan was approved.',    'Approval',     NOW(), TRUE),
+(9002, 1002, 'Missing prerequisite for IS310.',   'Prerequisite', NOW(), FALSE),
+(9003, 1003, 'Course ENME301 added to plan.',     'Update',       NOW(), TRUE);
 
 COMMIT;
