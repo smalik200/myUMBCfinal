@@ -93,4 +93,4 @@ git clone https://github.com/rainaz101/myUMBCfinal.git
 - Go to Recommendations page.  
 - Enter interests or concerns.  
 - View the generated personalized report.
-
+-Last updated for DockerHub deployment.
