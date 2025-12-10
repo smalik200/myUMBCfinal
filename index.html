@@ -828,6 +828,76 @@
             opacity: 0.9;
         }
 
+        /* LOGIN PAGE STYLES */
+        .login-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        .login-card {
+            max-width: 420px;
+            width: 100%;
+            padding: 36px 32px;
+            text-align: center;
+        }
+
+        .login-card h1 {
+            font-size: 26px;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .login-card h2 {
+            font-size: 16px;
+            margin-bottom: 22px;
+            color: #555;
+            font-weight: normal;
+        }
+
+        .login-card label {
+            display: block;
+            text-align: left;
+            margin-top: 12px;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border-radius: 6px;
+            border: 1px solid #999;
+            font-size: 14px;
+        }
+
+        .login-button {
+            margin-top: 20px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 999px;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        .login-button:hover {
+            opacity: 0.95;
+        }
+
+        .login-helper {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+        }
+
         @media (max-width: 900px) {
             .planner-content {
                 grid-template-columns: 1fr;
@@ -849,6 +919,28 @@
     </style>
 </head>
 <body>
+    <!-- LOGIN PAGE (first screen) -->
+    <div id="loginPage" class="login-wrapper">
+        <div class="card login-card">
+            <h1>myUMBC Login</h1>
+            <h2>Degree Planning Portal Prototype</h2>
+
+            <label for="loginEmail">UMBC Email</label>
+            <input type="email" id="loginEmail" placeholder="example1@umbc.edu" value="milo1@umbc.edu">
+
+            <label for="loginName">Name (optional)</label>
+            <input type="text" id="loginName" placeholder="Milo Morales" value="Milo Morales">
+
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" placeholder="••••••••">
+
+            <button class="login-button" type="button" onclick="handleLogin()">Log In</button>
+            <div class="login-helper">
+                This is a prototype login screen for the IS 436 project. Any password will work.
+            </div>
+        </div>
+    </div>
+
     <nav>
         <div class="nav-links">
             <a onclick="showPage('home')">Home</a>
@@ -1260,6 +1352,9 @@ Be as specific as possible about your interests, career goals, and any concerns!
     </div>
 
     <script>
+        // LOGIN STATE
+        let isLoggedIn = false;
+
         // Expanded Course Database
         const courses = [
             // IS 400-level
@@ -1347,6 +1442,11 @@ Be as specific as possible about your interests, career goals, and any concerns!
         let selectedDate = null;
 
         function showPage(pageId) {
+            if (!isLoggedIn) {
+                alert('Please log in first to access the dashboard.');
+                return;
+            }
+
             const pages = document.querySelectorAll('.page');
             pages.forEach(page => {
                 page.classList.remove('active');
@@ -1648,12 +1748,12 @@ Be as specific as possible about your interests, career goals, and any concerns!
                     course.title.toLowerCase().includes(searchTerm) ||
                     course.description.toLowerCase().includes(searchTerm);
 
-                const matchesDept = !deptFilter || course.dept === deptFilter;
-                const matchesLevel = !levelFilter || course.level === levelFilter;
-                const matchesCredits = !creditsFilter || course.credits === parseInt(creditsFilter);
+            const matchesDept = !deptFilter || course.dept === deptFilter;
+            const matchesLevel = !levelFilter || course.level === levelFilter;
+            const matchesCredits = !creditsFilter || course.credits === parseInt(creditsFilter);
 
-                return matchesSearch && matchesDept && matchesLevel && matchesCredits;
-            });
+            return matchesSearch && matchesDept && matchesLevel && matchesCredits;
+        });
 
             displayCourses(filtered);
         }
@@ -1703,8 +1803,53 @@ Be as specific as possible about your interests, career goals, and any concerns!
             alert('📢 Notifications:\n\n• Registration for Fall 2025 opens April 15\n• Advisor meeting scheduled for Dec 5\n• IS 495 Capstone registration requires advisor approval\n• New internship opportunities posted in Handshake');
         }
 
-        // Initialize course search on page load
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+
+            if (!email) {
+                alert('Please enter your UMBC email to continue.');
+                return;
+            }
+
+            // Simple prototype check – in a real system there would be authentication
+            if (!email.endsWith('@umbc.edu')) {
+                alert('Please use a valid UMBC email address (must end with @umbc.edu).');
+                return;
+            }
+
+            isLoggedIn = true;
+
+            // Update displayed student name/email if provided
+            if (name) {
+                document.getElementById('studentNameDisplay').textContent = name;
+                document.getElementById('editName').value = name;
+            }
+            document.getElementById('studentEmailDisplay').textContent = email;
+            document.getElementById('editEmail').value = email;
+
+            // Hide login, show nav + notifications + home page
+            document.getElementById('loginPage').style.display = 'none';
+            document.querySelector('nav').style.display = 'flex';
+            document.querySelector('.notification-container').style.display = 'block';
+
+            showPage('home');
+        }
+
+        // Initialize on page load
         window.addEventListener('load', () => {
+            // Hide nav + notifications until after login
+            document.querySelector('nav').style.display = 'none';
+            document.querySelector('.notification-container').style.display = 'none';
+
+            // Hide all app pages; only show login screen
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => {
+                page.classList.remove('active');
+                page.style.display = 'none';
+            });
+            document.getElementById('loginPage').style.display = 'flex';
+
             if (document.getElementById('courseResults')) {
                 searchCourses();
             }
