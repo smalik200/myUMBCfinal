@@ -269,7 +269,7 @@
             cursor: default;
         }
 
-        .calendar-cell:hover:not(.empty) {
+        .calendar-cell:hover:not(.empty)) {
             background-color: #ffd700;
         }
 
@@ -835,29 +835,54 @@
             align-items: center;
             justify-content: center;
             padding: 40px 20px;
+            flex-direction: column;
+            gap: 24px;
+            background: linear-gradient(135deg, #f7f7f7, #e0e0e0);
         }
 
         .login-card {
             max-width: 420px;
             width: 100%;
             padding: 36px 32px;
-            text-align: center;
+            text-align: left;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.12);
+        }
+
+        .login-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .login-logo-circle {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            background-color: #ffd700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            color: #333;
         }
 
         .login-card h1 {
             font-size: 26px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             color: #333;
         }
 
         .login-card h2 {
             font-size: 16px;
-            margin-bottom: 22px;
+            margin-bottom: 12px;
             color: #555;
             font-weight: normal;
         }
 
-        .login-card label {
+        .login-card label,
+        .create-account-card label {
             display: block;
             text-align: left;
             margin-top: 12px;
@@ -896,6 +921,46 @@
             margin-top: 10px;
             font-size: 12px;
             color: #666;
+            text-align: left;
+            line-height: 1.5;
+        }
+
+        .create-account-card {
+            max-width: 520px;
+            width: 100%;
+            padding: 28px 26px;
+            text-align: left;
+            display: none;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
+        }
+
+        .create-account-card h2 {
+            font-size: 20px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .create-account-card p {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 6px;
+        }
+
+        .create-button {
+            margin-top: 18px;
+            width: 100%;
+            padding: 12px;
+            border-radius: 999px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .create-button:hover {
+            opacity: 0.95;
         }
 
         @media (max-width: 900px) {
@@ -915,6 +980,11 @@
             .edit-btn {
                 display: none;
             }
+
+            .login-card,
+            .create-account-card {
+                max-width: 100%;
+            }
         }
     </style>
 </head>
@@ -922,22 +992,58 @@
     <!-- LOGIN PAGE (first screen) -->
     <div id="loginPage" class="login-wrapper">
         <div class="card login-card">
-            <h1>myUMBC Login</h1>
-            <h2>Degree Planning Portal Prototype</h2>
+            <div class="login-title">
+                <div class="login-logo-circle">UMBC</div>
+                <div>
+                    <h1>myUMBC Login</h1>
+                    <h2>Degree Planning Portal Prototype</h2>
+                </div>
+            </div>
 
             <label for="loginEmail">UMBC Email</label>
-            <input type="email" id="loginEmail" placeholder="example1@umbc.edu" value="milo1@umbc.edu">
+            <input type="email" id="loginEmail" placeholder="yourname@umbc.edu">
 
             <label for="loginName">Name (optional)</label>
-            <input type="text" id="loginName" placeholder="Milo Morales" value="Milo Morales">
+            <input type="text" id="loginName" placeholder="Your Name">
 
             <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" placeholder="••••••••">
+            <input type="password" id="loginPassword" placeholder="Enter your password">
 
             <button class="login-button" type="button" onclick="handleLogin()">Log In</button>
-            <div class="login-helper">
-                This is a prototype login screen for the IS 436 project. Any password will work.
+            <div class="login-helper" id="loginHelperText">
+                Demo login for presentation:<br>
+                <strong>Email:</strong> milo1@umbc.edu<br>
+                <strong>Password:</strong> milomilo<br><br>
+                If you use a different UMBC email, you’ll be able to create a demo account below.
             </div>
+        </div>
+
+        <div class="card create-account-card" id="createAccountCard">
+            <h2>Create an Account</h2>
+            <p>We didn’t recognize that login. Create a demo account to explore the degree planner.</p>
+
+            <label for="createName">Full Name</label>
+            <input type="text" id="createName" placeholder="Your Name">
+
+            <label for="createEmail">UMBC Email</label>
+            <input type="email" id="createEmail" placeholder="yourname@umbc.edu">
+
+            <label for="createPassword">Password</label>
+            <input type="password" id="createPassword" placeholder="Choose a password">
+
+            <label for="createPasswordConfirm">Confirm Password</label>
+            <input type="password" id="createPasswordConfirm" placeholder="Re-enter your password">
+
+            <label for="createMajor">Intended Major</label>
+            <select id="createMajor">
+                <option value="Information Systems" selected>Information Systems</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Mechanical Engineering">Mechanical Engineering</option>
+                <option value="Biology">Biology</option>
+                <option value="Undecided">Undecided</option>
+            </select>
+
+            <button class="create-button" type="button" onclick="handleCreateAccount()">Create Account</button>
         </div>
     </div>
 
@@ -1354,6 +1460,8 @@ Be as specific as possible about your interests, career goals, and any concerns!
     <script>
         // LOGIN STATE
         let isLoggedIn = false;
+        const demoEmail = 'milo1@umbc.edu';
+        const demoPassword = 'milomilo';
 
         // Expanded Course Database
         const courses = [
@@ -1748,12 +1856,12 @@ Be as specific as possible about your interests, career goals, and any concerns!
                     course.title.toLowerCase().includes(searchTerm) ||
                     course.description.toLowerCase().includes(searchTerm);
 
-            const matchesDept = !deptFilter || course.dept === deptFilter;
-            const matchesLevel = !levelFilter || course.level === levelFilter;
-            const matchesCredits = !creditsFilter || course.credits === parseInt(creditsFilter);
+                const matchesDept = !deptFilter || course.dept === deptFilter;
+                const matchesLevel = !levelFilter || course.level === levelFilter;
+                const matchesCredits = !creditsFilter || course.credits === parseInt(creditsFilter);
 
-            return matchesSearch && matchesDept && matchesLevel && matchesCredits;
-        });
+                return matchesSearch && matchesDept && matchesLevel && matchesCredits;
+            });
 
             displayCourses(filtered);
         }
@@ -1803,37 +1911,103 @@ Be as specific as possible about your interests, career goals, and any concerns!
             alert('📢 Notifications:\n\n• Registration for Fall 2025 opens April 15\n• Advisor meeting scheduled for Dec 5\n• IS 495 Capstone registration requires advisor approval\n• New internship opportunities posted in Handshake');
         }
 
-        function handleLogin() {
-            const email = document.getElementById('loginEmail').value.trim();
-            const name = document.getElementById('loginName').value.trim();
-
-            if (!email) {
-                alert('Please enter your UMBC email to continue.');
-                return;
-            }
-
-            // Simple prototype check – in a real system there would be authentication
-            if (!email.endsWith('@umbc.edu')) {
-                alert('Please use a valid UMBC email address (must end with @umbc.edu).');
-                return;
-            }
-
+        function completeLogin(name, email, majorOverride) {
             isLoggedIn = true;
 
-            // Update displayed student name/email if provided
-            if (name) {
-                document.getElementById('studentNameDisplay').textContent = name;
-                document.getElementById('editName').value = name;
-            }
+            const displayName = name || 'Milo Morales';
+            const firstName = displayName.split(' ')[0];
+
+            document.getElementById('studentNameDisplay').textContent = displayName;
+            document.getElementById('editName').value = displayName;
             document.getElementById('studentEmailDisplay').textContent = email;
             document.getElementById('editEmail').value = email;
 
-            // Hide login, show nav + notifications + home page
+            if (majorOverride) {
+                document.getElementById('studentMajorDisplay').textContent = majorOverride;
+                document.getElementById('editMajor').value = majorOverride;
+            }
+
+            const welcomeHeading = document.querySelector('.welcome-card h1');
+            if (welcomeHeading) {
+                welcomeHeading.textContent = `Hello ${firstName}!`;
+            }
+
+            // Hide login, show nav + notifications
             document.getElementById('loginPage').style.display = 'none';
             document.querySelector('nav').style.display = 'flex';
             document.querySelector('.notification-container').style.display = 'block';
 
             showPage('home');
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim();
+            const name = document.getElementById('loginName').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                alert('Please enter your UMBC email and password to continue.');
+                return;
+            }
+
+            if (!email.endsWith('@umbc.edu')) {
+                alert('Please use a valid UMBC email address (must end with @umbc.edu).');
+                return;
+            }
+
+            if (email.toLowerCase() === demoEmail && password === demoPassword) {
+                const displayName = name || 'Milo Morales';
+                completeLogin(displayName, email);
+                document.getElementById('loginPassword').value = '';
+                return;
+            }
+
+            // Not the demo account – show create account section
+            const helper = document.getElementById('loginHelperText');
+            if (helper) {
+                helper.innerHTML = 'We couldn\'t find that account in this demo.<br><strong>Create a new account below</strong> to continue.';
+            }
+
+            const createCard = document.getElementById('createAccountCard');
+            if (createCard) {
+                createCard.style.display = 'block';
+            }
+
+            const createEmail = document.getElementById('createEmail');
+            const createName = document.getElementById('createName');
+            if (createEmail) createEmail.value = email;
+            if (createName && name) createName.value = name;
+        }
+
+        function handleCreateAccount() {
+            const name = document.getElementById('createName').value.trim();
+            const email = document.getElementById('createEmail').value.trim();
+            const password = document.getElementById('createPassword').value;
+            const confirmPassword = document.getElementById('createPasswordConfirm').value;
+            const major = document.getElementById('createMajor').value;
+
+            if (!email || !password || !confirmPassword) {
+                alert('Please complete email and password fields to create an account.');
+                return;
+            }
+
+            if (!email.endsWith('@umbc.edu')) {
+                alert('Please use a valid UMBC email address (must end with @umbc.edu).');
+                return;
+            }
+
+            if (password.length < 6) {
+                alert('Please choose a password with at least 6 characters.');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                alert('Passwords do not match. Please re-enter them.');
+                return;
+            }
+
+            alert('Demo account created! You are now logged in.');
+            completeLogin(name || 'New Retriever', email, major);
         }
 
         // Initialize on page load
